@@ -46,7 +46,7 @@ const TimelineSegment = ({ segment, index, moveSegment }: {
   
   return (
     <div 
-      ref={(node) => drag(drop(node))}
+    ref={(node) => { drag(drop(node)); }}
       className={`timeline-segment ${selectedSegment === segment.id ? 'selected' : ''}`}
       style={{ 
         width: `${duration * 50}px`,
