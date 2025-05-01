@@ -7,10 +7,7 @@ export interface TextOverlay {
   font: string
   fontSize: number
   color: string
-  position: {
-    x: number
-    y: number
-  }
+  position: { x: number; y: number }
   startTime: number
   endTime: number
 }
@@ -19,20 +16,10 @@ export interface ImageOverlay {
   id: string
   type: 'image'
   src: string
-  position: {
-    x: number
-    y: number
-  }
-  size: {
-    width: number
-    height: number
-  }
+  position: { x: number; y: number }
+  size: { width: number; height: number }
   opacity: number
-  border: {
-    width: number
-    color: string
-    style: string
-  }
+  border: { width: number; color: string; style: string }
   startTime: number
   endTime: number
 }
@@ -55,10 +42,21 @@ export const overlaySlice = createSlice({
       state.overlays.push(action.payload)
     },
     updateOverlay: (state, action: PayloadAction<{ id: string; changes: Partial<Overlay> }>) => {
-      const { id, changes } = action.payload
-      const overlayIndex = state.overlays.findIndex(overlay => overlay.id === id)
-      if (overlayIndex !== -1) {
-        state.overlays[overlayIndex] = { ...state.overlays[overlayIndex], ...changes }
+      const { id, changes } = action.payload;
+      const index = state.overlays.findIndex(overlay => overlay.id === id);
+      if (index !== -1) {
+        const existing = state.overlays[index];
+        if (existing.type === 'text') {
+          state.overlays[index] = {
+            ...(existing as TextOverlay),
+            ...(changes as Partial<TextOverlay>),
+          };
+        } else if (existing.type === 'image') {
+          state.overlays[index] = {
+            ...(existing as ImageOverlay),
+            ...(changes as Partial<ImageOverlay>),
+          };
+        }
       }
     },
     removeOverlay: (state, action: PayloadAction<string>) => {
@@ -66,16 +64,19 @@ export const overlaySlice = createSlice({
     },
     updateOverlayPosition: (state, action: PayloadAction<{ id: string; position: { x: number; y: number } }>) => {
       const { id, position } = action.payload
-      const overlayIndex = state.overlays.findIndex(overlay => overlay.id === id)
-      if (overlayIndex !== -1) {
-        state.overlays[overlayIndex].position = position
+      const index = state.overlays.findIndex(overlay => overlay.id === id)
+      if (index !== -1) {
+        state.overlays[index] = {
+          ...state.overlays[index],
+          position,
+        }
       }
     },
     updateImageOverlaySize: (state, action: PayloadAction<{ id: string; size: { width: number; height: number } }>) => {
       const { id, size } = action.payload
-      const overlayIndex = state.overlays.findIndex(overlay => overlay.id === id && overlay.type === 'image')
-      if (overlayIndex !== -1) {
-        (state.overlays[overlayIndex] as ImageOverlay).size = size
+      const index = state.overlays.findIndex(overlay => overlay.id === id && overlay.type === 'image')
+      if (index !== -1) {
+        (state.overlays[index] as ImageOverlay).size = size
       }
     },
   },
